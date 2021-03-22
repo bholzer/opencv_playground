@@ -52,7 +52,7 @@ def verifyCircle(x, y, r, edges):
 		maxInlierDist = maxInlierDistMax
 
 	C = 2*math.pi
-	verifySampleCount = 170
+	verifySampleCount = 90
 
 	inlier = 0
 	for t in np.arange(0, C, C/verifySampleCount):
@@ -115,7 +115,7 @@ while True:
 	# blobs left in the mask
 	mask = cv2.inRange(hsv, redLower, redUpper)
 	mask = cv2.erode(mask, None, iterations=6)
-	mask = cv2.dilate(mask, None, iterations=2)
+	mask = cv2.dilate(mask, None, iterations=4)
 
 	edges = cv2.Canny(mask,100,200)
 	# dilEdge = cv2.dilate(edges, None, iterations=1)
@@ -125,8 +125,8 @@ while True:
 	dt = cv2.distanceTransform(255-edges, cv2.DIST_L2, 3)
 	points = np.unique(np.argwhere(edges>0), axis=0) # Get coordinates of detected edges
 
-	minRadius = 100
-	minPercent = 0.60
+	minRadius = 5
+	minPercent = 0.70
 	pointCount = points.shape[0]
 	bestCircle = [0,0,0,0]
 
@@ -149,8 +149,8 @@ while True:
 		if perc >= minPercent and r > minRadius and perc > bestCircle[3]:
 			bestCircle = [x,y,r,perc]
 
-		# if bestCircle[3] >= 0.85:
-		# 	break
+		if bestCircle[3] >= 0.85:
+			break
 		
 	if bestCircle[3] >= minPercent and bestCircle[2] >= minRadius:
 		cv2.circle(frame, (bestCircle[1], bestCircle[0]), bestCircle[2], (0, 255, 255), 1)
